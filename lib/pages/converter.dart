@@ -80,14 +80,14 @@ class _StepperExampleState extends State<StepperExample> {
     var inputSourceWidget = getInputSourceWidget(1);
     var inputDestinationWidget = getInputSourceWidget(0);
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Stepper Example'),
-      ),
+      // appBar: AppBar(
+      //   title: Text('Stepper Example'),
+      // ),
       body: Stepper(
         elevation: 4,
         physics: ClampingScrollPhysics(),
         currentStep: _currentStep,
-        type: StepperType.vertical,
+        type: StepperType.horizontal,
         onStepTapped: (step) => setState(() => _currentStep = step),
         onStepContinue: _currentStep < 3 ? () => setState(() => _currentStep += 1) : null,
         onStepCancel: _currentStep > 0 ? () => setState(() => _currentStep -= 1) : null,
@@ -356,7 +356,7 @@ class _StepperExampleState extends State<StepperExample> {
 
   void _postForConvert() {
     // 发送请求
-    http.post(
+    /*http.post(
       Uri.parse('https://jsonplaceholder.typicode.com/albums'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -364,7 +364,7 @@ class _StepperExampleState extends State<StepperExample> {
       body: jsonEncode(<String, String>{
         'title': title,
       }),
-    );
+    );*/
   }
 }
 
