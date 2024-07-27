@@ -1,42 +1,147 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
+class TodoConstraint {
+  static const todoNavigationBottoms = <BottomNavigationBarItem>[
+    BottomNavigationBarItem(
+      icon: Icon(Icons.timer),
+      label: 'Timer',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.alarm),
+      label: 'Alarm',
+    ),
+  ];
+}
+
 class TodoPage extends StatefulWidget {
   @override
   _TodoPageState createState() => _TodoPageState();
 }
 
 class _TodoPageState extends State<TodoPage> {
-  late int _currentIndex = 0;
+  late int _pageIndex = 0;
 
   void onTabTapped(int index) {
     setState(() {
-      _currentIndex = index;
+      _pageIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    var mainBody = SwipeList(
+      visible: Text('123'),
+      offset: 40,
+    );
+    // return Container(
+    //   child: SwipeItem(
+    //     child: const Text('123'),
+    //     onButtonTap: () {
+    //       debugPrint('删除');
+    //     },
+    //   ),
+    // );
     return Scaffold(
-      body: Center(
-        child: SwipeList(
-          visible: Text('123'),
-          offset: 40,
+      body: Container(
+        color: Colors.white,
+        child: Center(
+          child: SwipeItem(
+            child: const Text('123'),
+            onButtonTap: () {
+              debugPrint('删除');
+            },
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         onTap: onTabTapped,
-        currentIndex: _currentIndex,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.timer),
-            label: 'Timer',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.alarm),
-            label: 'Alarm',
-          ),
-        ],
+        currentIndex: _pageIndex,
+        items: TodoConstraint.todoNavigationBottoms,
+      ),
+    );
+  }
+}
+
+/// Item
+class SwipeItem extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onButtonTap;
+  SwipeItem({required this.child, required this.onButtonTap});
+
+  @override
+  _SwipeItemState createState() => _SwipeItemState();
+}
+
+class _SwipeItemState extends State<SwipeItem> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _withAnimation;
+  final double _initialWidth = 500;
+  final double _swipedWidth = 450;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _controller = AnimationController(
+      duration: Duration(milliseconds: 200),
+      vsync: this,
+    );
+
+    _withAnimation = Tween<double>(
+      begin: _initialWidth,
+      end: _swipedWidth,
+    ).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return GestureDetector(
+      onHorizontalDragUpdate: (details) {
+        if (details.delta.dx < 0) {
+          _controller.forward();
+        } else {
+          _controller.reverse();
+        }
+      },
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Stack(
+            children: [
+              Positioned.fill(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Center(child: widget.child),
+                    ),
+                    if (_controller.value > 0.5)
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: widget.onButtonTap,
+                      )
+                  ],
+                ),
+              ),
+              Positioned.fill(
+                child: Center(
+                  child: Container(
+                    width: _withAnimation.value,
+                    color: Colors.transparent,
+                  ),
+                ),
+              )
+            ],
+          );
+        },
       ),
     );
   }
@@ -75,8 +180,7 @@ class _SwipeListState extends State<SwipeList> {
             });
 
             // Then show a snackbar.
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text('$item dismissed')));
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$item dismissed')));
           },
           // Show a red background as the item is swiped away.
           background: Container(color: Colors.red),
