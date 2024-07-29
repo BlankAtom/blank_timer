@@ -81,7 +81,6 @@ class _SwipeItemState extends State<SwipeItem> with SingleTickerProviderStateMix
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _controller = AnimationController(
       duration: Duration(milliseconds: 200),
@@ -96,14 +95,13 @@ class _SwipeItemState extends State<SwipeItem> with SingleTickerProviderStateMix
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    
     return GestureDetector(
       onHorizontalDragUpdate: (details) {
         if (details.delta.dx < 0) {
@@ -115,31 +113,40 @@ class _SwipeItemState extends State<SwipeItem> with SingleTickerProviderStateMix
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
-          return Stack(
-            children: [
-              Positioned.fill(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Center(child: widget.child),
-                    ),
-                    if (_controller.value > 0.5)
-                      IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: widget.onButtonTap,
-                      )
-                  ],
-                ),
-              ),
-              Positioned.fill(
-                child: Center(
-                  child: Container(
-                    width: _withAnimation.value,
-                    color: Colors.transparent,
+          return Container(
+            height: 200,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          color: Colors.blue.withOpacity(.5),
+                          // child: Center(child: widget.child)
+                          ),
+                      ),
+                      // if (_controller.value > 0.5)
+                        IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: widget.onButtonTap,
+                        )
+                    ],
                   ),
                 ),
-              )
-            ],
+                Positioned.fill(
+                  child: Center(
+                    child: Container(
+                      width: _withAnimation.value,
+                      color: Color(Colors.red.value).withOpacity(0.5),
+                      child:  Align(
+                      alignment: Alignment.centerLeft,
+                        child: widget.child),
+                    ),
+                  ),
+                )
+              ],
+            ),
           );
         },
       ),
