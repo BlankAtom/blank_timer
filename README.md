@@ -1,6 +1,8 @@
-# blank_timer
+# Blank Timer
 
 日程完成计时器
+
+![img1.png](docs/imgs/img.png)
 
 ## Getting Started
 
