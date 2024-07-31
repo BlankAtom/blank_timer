@@ -1,6 +1,7 @@
 // 从云端同步数据到本地
 
 // 仅用本地数据
+import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:json/json.dart';
@@ -25,7 +26,7 @@ CREATE TABLE $tableTodo (
 
 class DataObject {}
 
-@JsonCodable() // Macro annotation  But what is Macro?
+// @JsonCodable() // Macro annotation  But what is Macro?
 class TodoItem {
   final int id;
 
@@ -61,20 +62,36 @@ class TodoItem {
     this.createTime,
   );
 
-  // toMap() {
-  //   return {
-  //     'title': title,
-  //     'createTime': createTime,
-  //     'isDone': isDone,
-  //     'targetDateTime': targetDateTime,
-  //     'deleteTime': deleteTime,
-  //     'content': content,
-  //     'location': location,
-  //     'flag': flag,
-  //   };
-  // }
+  toMap() {
+    return {
+      'title': title,
+      'createTime': createTime,
+      'isDone': isDone,
+      'targetDateTime': targetDateTime,
+      'deleteTime': deleteTime,
+      'content': content,
+      'location': location,
+      'flag': flag,
+    };
+  }
 
-  // Map<String, dynamic> toJson() => toMap();
+  Map<String, dynamic> toJson() => toMap();
+
+  static fromMap(Map<String, dynamic> map) {
+    return TodoItem(
+      map['id'],
+      map['title'],
+      map['isDone'],
+      map['deleteTime'],
+      map['content'],
+      map['location'],
+      map['flag'],
+      map['targetDateTime'],
+      map['createTime'],
+    );
+  }
+
+  static TodoItem fromJson(Map<String, dynamic> json) => fromMap(json);
 }
 
 /// TodoProvider To Do 数据提供者
@@ -82,12 +99,14 @@ class ToDoProvider {
   /// Database of To do data.
   late Database db;
 
+  var _todoList = List<TodoItem>.empty();
+
   /// Open a connection to the database
-  Future<Database> openDb() async {
+  Future<void> openDb() async {
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, 'todo-data.db');
 
-    return await openDatabase(
+    db = await openDatabase(
       path,
       version: 1,
       onCreate: (db, version) async {
@@ -97,23 +116,35 @@ class ToDoProvider {
         );
       },
     );
+
+    refreshCache();
+  }
+
+  refreshCache() {
+    // queryData().then((value) {
+    //   _todoList = value;
+    // });
   }
 
   /// Insert data
   Future<void> insertData(TodoItem todo) async {
-    todo.toJson();
     await db.insert(
       tableTodo,
       todo.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+
+  
+    refreshCache();
   }
 
   /// Query data of all
   Future<List<TodoItem>> queryData() async {
-    return db.query(tableTodo).then((value) {
-      return value.map((e) => TodoItem.fromJson(e)).toList();
-    });
+    if(db == null){
+      await openDb();
+    }
+    final List<Map<String, dynamic>> maps = await db.query(tableTodo);
+    return maps.map((map) => TodoItem.fromJson(map)).toList();
   }
 
   /// Query data by id

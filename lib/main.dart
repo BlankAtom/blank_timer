@@ -1,11 +1,18 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:blank_timer/pages/todo.dart';
 import 'package:flutter/material.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'pages/converter.dart';
 
 void main() {
+  if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+    
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  } 
   runApp(const MyApp());
 }
 

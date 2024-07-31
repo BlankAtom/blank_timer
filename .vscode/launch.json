@@ -8,7 +8,8 @@
             "name": "blank_timer",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "debug"
+            "flutterMode": "debug",
+            // "args": ["--enable-experiment=macros"]
         },
         {
             "name": "blank_timer (profile mode)",

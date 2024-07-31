@@ -1,25 +1,36 @@
 import 'package:blank_timer/pages/swipe_item.dart';
 import 'package:blank_timer/pages/todo.dart';
+import 'package:blank_timer/todo_data.dart';
 import 'package:flutter/material.dart';
 
 // TODO 需要绑定一个集合引用，用于显示和修改列表，并作用于存储
 class SwipeList extends StatefulWidget {
   final String groupTitle;
+  // final List<TodoItem> children;
   late bool isExpanded = true;
+  
+  final ToDoProvider provider;
+
   // final double offset;
-  SwipeList({required this.groupTitle});
+  SwipeList({required this.groupTitle, required this.provider});
 
   @override
   _SwipeListState createState() => _SwipeListState();
 }
 
 class _SwipeListState extends State<SwipeList> {
-  final items = List<String>.generate(20, (i) => "Item ${i + 1}");
+  var items = List<TodoItem>.empty();
 
   final Color groupHeaderColor = Color.fromARGB(255, 234, 251, 253);
 
   @override
   Widget build(BuildContext context) {
+    widget.provider.queryData().then((value) {
+      setState(() {
+        items = value;
+      });
+    });
+    
     // 列表，有表头，使用 SwipItem 作为列表项
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -28,6 +39,19 @@ class _SwipeListState extends State<SwipeList> {
         children: getListItems(),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    initData();
+    super.initState();
+  }
+
+  initData() async {
+    var list = await widget.provider.queryData();
+    setState(() {
+      items = list;
+    });
   }
 
   List<Widget> getListItems() {
@@ -42,12 +66,13 @@ class _SwipeListState extends State<SwipeList> {
     }
 
     for (var i = 0; i < items.length; i++) {
+      var item =items[i];
       Widget? tile = Padding(
         padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 0),
         child: SwipeItem(
           key: Key(i.toString()),
           child: ListTile(
-            title: Text('${items[i]}'),
+            title: Text('${item.title}'),
           ),
         ),
       );
