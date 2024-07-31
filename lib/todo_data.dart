@@ -3,13 +3,14 @@
 // 仅用本地数据
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:json/json.dart';
 
 // 数据表名
-const tableName = 'TodoItem';
+const tableTodo = 'TodoItem';
 
 // 数据表创建SQL
 const sql = '''
-CREATE TABLE $tableName (
+CREATE TABLE $tableTodo (
   id INTEGER PRIMARY KEY, 
   title TEXT,
   createTime INTEGER,
@@ -24,98 +25,147 @@ CREATE TABLE $tableName (
 
 class DataObject {}
 
+@JsonCodable() // Macro annotation  But what is Macro?
 class TodoItem {
-  final title;
-  final isDone = 0;
-  final deleteTime = 0;
-  final content = '';
-  final location = '';
-  final flag = 0;
+  final int id;
 
-  late final targetDateTime;
-  late final createTime;
+  final String title;
+  final int isDone;
+  final int deleteTime;
+  final String content;
+  final String location;
+  final int flag;
 
-  TodoItem({required this.title}) {
-    createTime = DateTime.now().millisecondsSinceEpoch;
-    targetDateTime = DateTime.now().millisecondsSinceEpoch;
+  final int targetDateTime;
+  final int createTime;
+
+  // TodoItem(
+  //     {this.title,
+  //     this.isDone = 0,
+  //     this.deleteTime = 0,
+  //     this.content = '',
+  //     this.location = '',
+  //     this.flag = 0}) {
+  //   createTime = DateTime.now().millisecondsSinceEpoch;
+  //   targetDateTime = DateTime.now().millisecondsSinceEpoch;
+  // }
+  TodoItem(
+    this.id,
+    this.title,
+    this.isDone,
+    this.deleteTime,
+    this.content,
+    this.location,
+    this.flag,
+    this.targetDateTime,
+    this.createTime,
+  );
+
+  // toMap() {
+  //   return {
+  //     'title': title,
+  //     'createTime': createTime,
+  //     'isDone': isDone,
+  //     'targetDateTime': targetDateTime,
+  //     'deleteTime': deleteTime,
+  //     'content': content,
+  //     'location': location,
+  //     'flag': flag,
+  //   };
+  // }
+
+  // Map<String, dynamic> toJson() => toMap();
+}
+
+/// TodoProvider To Do 数据提供者
+class ToDoProvider {
+  /// Database of To do data.
+  late Database db;
+
+  /// Open a connection to the database
+  Future<Database> openDb() async {
+    final databasePath = await getDatabasesPath();
+    final path = join(databasePath, 'todo-data.db');
+
+    return await openDatabase(
+      path,
+      version: 1,
+      onCreate: (db, version) async {
+        // Create a table
+        await db.execute(
+          sql,
+        );
+      },
+    );
   }
 
-  toMap() {
-    return {
-      'title': title,
-      'createTime': createTime,
-      'isDone': isDone,
-      'targetDateTime': targetDateTime,
-      'deleteTime': deleteTime,
-      'content': content,
-      'location': location,
-      'flag': flag,
-    };
+  /// Insert data
+  Future<void> insertData(TodoItem todo) async {
+    todo.toJson();
+    await db.insert(
+      tableTodo,
+      todo.toJson(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
-  Map<String, dynamic> toJson() => toMap();
+  /// Query data of all
+  Future<List<TodoItem>> queryData() async {
+    return db.query(tableTodo).then((value) {
+      return value.map((e) => TodoItem.fromJson(e)).toList();
+    });
+  }
+
+  /// Query data by id
+  Future<TodoItem> queryDataById(int id) async {
+    return db.query(tableTodo, where: 'id = ?', whereArgs: [id]).then((value) {
+      return TodoItem.fromJson(value.first);
+    });
+  }
+
+  /// Update data
+  Future<void> updateData(TodoItem todo) async {
+    await db.update(
+      tableTodo,
+      todo.toJson(),
+      where: 'id = ?',
+      whereArgs: [todo.id],
+    );
+  }
+
+  /// Delete data
+  Future<void> deleteData(TodoItem todo) async {
+    await db.delete(
+      tableTodo,
+      where: 'id = ?',
+      whereArgs: [todo.id],
+    );
+  }
+
+  Future<void> closeAsync() async {
+    await db.close();
+  }
 }
 
-// Open a connection to the database
-Future<Database> openDb() async {
-  final databasePath = await getDatabasesPath();
-  final path = join(databasePath, 'todo-data.db');
 
-  return openDatabase(
-    path,
-    onCreate: (db, version) {
-      // Create a table
-      return db.execute(
-        sql,
-      );
-    },
-    version: 1,
-  );
-}
 
-// Insert data
-Future<void> insertData(Database db, String name) async {
-  await db.insert(
-    tableName,
-    {'name': name},
-    conflictAlgorithm: ConflictAlgorithm.replace,
-  );
-}
+// // Example usage
+// Future<void> main() async {
+//   final db = await openDb();
 
-// Query data
-Future<List<Map<String, dynamic>>> queryData(Database db) async {
-  return db.query(tableName);
-}
+//   await insertData(db, 'Sample Name');
+//   final queriedData = await queryData(db);
+//   print(queriedData);
 
-// Update data
-Future<void> updateData(Database db, int id, String name) async {
-  await db.update(
-    tableName,
-    {'name': name},
-    where: 'id = ?',
-    whereArgs: [id],
-  );
-}
+//   await updateData(db, 1, 'Updated Name');
+//   await deleteData(db, 1);
 
-// Delete data
-Future<void> deleteData(Database db, int id) async {
-  await db.delete(
-    tableName,
-    where: 'id = ?',
-    whereArgs: [id],
-  );
-}
+//   db.close();
+// }
 
-// Example usage
-Future<void> main() async {
-  final db = await openDb();
 
-  await insertData(db, 'Sample Name');
-  final queriedData = await queryData(db);
-  print(queriedData);
-
-  await updateData(db, 1, 'Updated Name');
-  await deleteData(db, 1);
-
-  db.close();
-}
+// class TodoDataTest {
+//   TodoDataTest(){
+    
+//   }
+// }

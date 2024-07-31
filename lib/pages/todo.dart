@@ -15,7 +15,7 @@ class TodoConstraint {
       label: 'Today',
     ),
     BottomNavigationBarItem(
-      icon: Icon(Icons.alarm),
+      icon: Icon(Icons.sunny),
       label: 'Alarm',
     ),
   ];
