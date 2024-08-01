@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:blank_timer/todo_data.dart';
-import 'package:json/json.dart';
 
 /// Entry point for the test file.
 void main() {

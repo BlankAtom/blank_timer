@@ -55,7 +55,8 @@ class _TodayTodoPageState extends State<TodayTodoPage> {
     _todoProvider = ToDoProvider();
   }
 
-  List<TodoItem> items = [];
+  List<TodoItem> undoneList = [];
+  List<TodoItem> doneList = [];
 
   @override
   void initState() {
@@ -64,7 +65,8 @@ class _TodayTodoPageState extends State<TodayTodoPage> {
     bus.on("todoUpdated", (arg) {
       _todoProvider.queryData().then((value) {
         setState(() {
-          items = value;
+          undoneList = value.where((t) => t.isDone == 0).toList();
+          doneList = value.where((t) => t.isDone == 1).toList();
         });
 
         debugPrint('Todo updated');
@@ -74,7 +76,8 @@ class _TodayTodoPageState extends State<TodayTodoPage> {
     _todoProvider.openDb().then((value) {
       _todoProvider.queryData().then((value) {
         setState(() {
-          items = value;
+          undoneList = value.where((t) => t.isDone == 0).toList();
+          doneList = value.where((t) => t.isDone == 1).toList();
         });
       });
     });
@@ -94,22 +97,40 @@ class _TodayTodoPageState extends State<TodayTodoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white70,
+      // backgroundColor: Colors.white70,
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: 'History',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.today_rounded),
+            label: 'Today',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.sunny),
+            label: 'Future',
+          ),
+        ],
+        currentIndex: _pageIndex,
+        onTap: onTabTapped,
+      ),
       body: Center(
         child: Container(
+          margin:  EdgeInsets.symmetric(horizontal: 24),
           constraints: BoxConstraints(
             maxWidth: 720, // Set the maximum width here
           ),
-        
           alignment: Alignment.topCenter,
-          
           child: Column(
             children: [
               Expanded(
                 child: TodoListGroupView(
                   groupTitle: '未完成',
                   // provider: _todoProvider,
-                  children: items,
+                  undoItems: undoneList,
+                  doneItems: doneList,
                   onItemChange: (item) {
                     // item.status = 2;
                     // item.updatedAt = DateTime.now().millisecondsSinceEpoch;
@@ -123,8 +144,8 @@ class _TodayTodoPageState extends State<TodayTodoPage> {
                   },
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
+              Container(
+                margin: EdgeInsets.only(top: 16), 
                 child: TodoAddBox(onAdded: (value) {
                   _todoProvider.insertData(value);
                   bus.emit("todoUpdated");
@@ -149,6 +170,8 @@ class TodoAddBox extends StatefulWidget {
 
 class _TodoAddBoxState extends State<TodoAddBox> {
   TextEditingController? _controller;
+  FocusNode _focusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -161,6 +184,7 @@ class _TodoAddBoxState extends State<TodoAddBox> {
   @override
   void dispose() {
     _controller!.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -183,6 +207,7 @@ class _TodoAddBoxState extends State<TodoAddBox> {
               child: TextField(
                 controller: _controller,
                 onSubmitted: _handleSubmitted,
+                focusNode: _focusNode,
               ),
             ),
           ],
@@ -192,11 +217,16 @@ class _TodoAddBoxState extends State<TodoAddBox> {
   }
 
   void _handleSubmitted(String text) {
+    if (text.isEmpty) {
+      _focusNode.requestFocus();
+      return;
+    }
+
     TodoItem item = TodoItem(
         0,
         text,
-        1,
-        DateTime.now().millisecondsSinceEpoch,
+        0,
+        0,
         '',
         '',
         0,
@@ -206,6 +236,7 @@ class _TodoAddBoxState extends State<TodoAddBox> {
     setState(() {
       widget.onAdded(item);
       _controller!.clear();
+      _focusNode.requestFocus();
     });
   }
 }

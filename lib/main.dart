@@ -7,12 +7,17 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'pages/converter.dart';
 
+Map<String, WidgetBuilder> routes = {
+  '/': (context) => MyHomePage(title: 'Flutter Demo Home Page'),
+  '/todo': (context) => TodayTodoPage(),
+  '/converter': (context) => StepperExample(),
+};
+
 void main() {
   if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-    
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
-  } 
+  }
   runApp(const MyApp());
 }
 
@@ -43,6 +48,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
+      // routes: routes,
       home: TodayTodoPage(),
     );
   }
@@ -308,7 +314,8 @@ class _TimerActiveState extends State<TimerActive> {
      * 由于 Stopwatch计时，有经过的时间长度B，所以S又可以表示为
      * S = B - X
      */
-    var duration = (_stopwatch.elapsed - Duration(milliseconds: widget.scale)).abs();
+    var duration =
+        (_stopwatch.elapsed - Duration(milliseconds: widget.scale)).abs();
 
     return '${duration.inHours.toString().padLeft(2, '0')}'
         ':${duration.inMinutes.toString().padLeft(2, '0')}'
@@ -367,7 +374,11 @@ class CircleProgressBar extends StatelessWidget {
   final String label;
   final bool isRunning;
 
-  CircleProgressBar({required this.progress, required this.isRunning, required this.label, required this.lastProgress});
+  CircleProgressBar(
+      {required this.progress,
+      required this.isRunning,
+      required this.label,
+      required this.lastProgress});
 
   @override
   Widget build(BuildContext context) {
@@ -414,12 +425,16 @@ class AnimatedCircle extends StatefulWidget {
   final double lastProgress;
   final Widget child;
 
-  AnimatedCircle({required this.progress, required this.child, required this.lastProgress});
+  AnimatedCircle(
+      {required this.progress,
+      required this.child,
+      required this.lastProgress});
   @override
   _AnimatedCircleState createState() => _AnimatedCircleState();
 }
 
-class _AnimatedCircleState extends State<AnimatedCircle> with SingleTickerProviderStateMixin {
+class _AnimatedCircleState extends State<AnimatedCircle>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -434,7 +449,8 @@ class _AnimatedCircleState extends State<AnimatedCircle> with SingleTickerProvid
     );
 
     print('last: ${widget.lastProgress}, now: ${widget.progress}');
-    _animation = Tween<double>(begin: widget.lastProgress, end: widget.progress).animate(_controller)
+    _animation = Tween<double>(begin: widget.lastProgress, end: widget.progress)
+        .animate(_controller)
       ..addListener(() {
         setState(() {
           _pro = _animation.value;

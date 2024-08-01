@@ -4,7 +4,6 @@
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:json/json.dart';
 
 // 数据表名
 const tableTodo = 'TodoItem';
@@ -30,15 +29,15 @@ class DataObject {}
 class TodoItem {
   final int id;
 
-  final String title;
-  final int isDone;
-  final int deleteTime;
-  final String content;
-  final String location;
-  final int flag;
+  String title;
+  int isDone;
+  int deleteTime;
+  String content;
+  String location;
+  int flag;
 
-  final int targetDateTime;
-  final int createTime;
+  int targetDateTime;
+  int createTime;
 
   bool isToday(){
     var now = DateTime.now();

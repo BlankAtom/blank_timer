@@ -17,11 +17,17 @@ class SwipeItem extends StatefulWidget {
   final Key key;
 
   final ValueChanged<TodoItem> onItemDeleted;
-  
+
   final TodoItem todoItem;
 
+  final ValueChanged<TodoItem> onItemChange;
+
   SwipeItem(
-      {required this.key, required this.child, required this.onItemDeleted, required this.todoItem});
+      {required this.key,
+      required this.child,
+      required this.onItemDeleted,
+      required this.todoItem,
+      required this.onItemChange});
 
   @override
   _SwipeItemState createState() => _SwipeItemState();
@@ -36,7 +42,8 @@ class _SwipeItemState extends State<SwipeItem> {
 
   @override
   Widget build(BuildContext context) {
-    final Color _itemForegroundColor = Color.fromRGBO(223, 223, 223, 1);
+    final Color _itemForegroundColor = Colors.pink[50]!;
+    final Color _itemDoneForegroundColor = Colors.grey;
     final Color _itemDeleteViewColor = Color(Colors.red[400]!.value);
     final Color _itemMoveViewColor = Color(Colors.blue[400]!.value);
 
@@ -68,12 +75,48 @@ class _SwipeItemState extends State<SwipeItem> {
       ),
     );
 
-    return Dismissible(
+    return Container(
+      decoration: BoxDecoration(
+        color: widget.todoItem.isDone == 1 ? _itemDoneForegroundColor : _itemForegroundColor,
+        borderRadius: _itemCircleRadius,
+      ),
+      height: _itemHeight,
+      child: Row(
+        children: [
+          SizedBox(
+            width: _checkBoxWidth,
+            child: Checkbox(
+              onChanged: (v) {
+                setState(() {
+                  checked = v!;
+                  widget.todoItem.isDone = checked ? 1 : 0;
+                  widget.onItemChange(widget.todoItem);
+                });
+              },
+              value: widget.todoItem.isDone == 1,
+              shape: const CircleBorder(),
+            ),
+          ),
+          Expanded(
+            child: ListTile(
+              title: Text(
+                widget.todoItem.title,
+                style: TextStyle(
+                    decoration: widget.todoItem.isDone == 1
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    Dismissible(
       key: widget.key,
       background: background,
       secondaryBackground: secondaryBackground,
       onDismissed: (direction) {
-          widget.onItemDeleted(widget.todoItem);
+        widget.onItemDeleted(widget.todoItem);
       },
       confirmDismiss: (direction) async {
         if (direction == DismissDirection.endToStart) {
@@ -91,7 +134,7 @@ class _SwipeItemState extends State<SwipeItem> {
           children: [
             SizedBox(
               width: _checkBoxWidth,
-      
+
               // The Selecter box
               child: Checkbox(
                 onChanged: (v) {
