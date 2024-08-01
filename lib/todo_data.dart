@@ -40,6 +40,12 @@ class TodoItem {
   final int targetDateTime;
   final int createTime;
 
+  bool isToday(){
+    var now = DateTime.now();
+    var target = DateTime.fromMillisecondsSinceEpoch(targetDateTime);
+    return now.year == target.year && now.month == target.month && now.day == target.day;
+  }
+
   // TodoItem(
   //     {this.title,
   //     this.isDone = 0,
@@ -97,14 +103,18 @@ class TodoItem {
 /// TodoProvider To Do 数据提供者
 class ToDoProvider {
   /// Database of To do data.
-  late Database db;
+  late Database? db;
 
-  var _todoList = List<TodoItem>.empty();
+  // bool get isOpened => db != null && db!.isOpen;
 
   /// Open a connection to the database
   Future<void> openDb() async {
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, 'todo-data.db');
+
+    // if (db != null && db!.isOpen) {
+    //   return;
+    // }
 
     db = await openDatabase(
       path,
@@ -128,7 +138,7 @@ class ToDoProvider {
 
   /// Insert data
   Future<void> insertData(TodoItem todo) async {
-    await db.insert(
+    await db?.insert(
       tableTodo,
       todo.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
@@ -140,23 +150,28 @@ class ToDoProvider {
 
   /// Query data of all
   Future<List<TodoItem>> queryData() async {
-    if(db == null){
-      await openDb();
+    var maps = await db?.query(tableTodo);
+    if(maps == null || maps.isEmpty){
+      return [];
     }
-    final List<Map<String, dynamic>> maps = await db.query(tableTodo);
-    return maps.map((map) => TodoItem.fromJson(map)).toList();
+
+    return [
+      for (var map in maps) TodoItem.fromJson(map)
+    ];
   }
 
   /// Query data by id
-  Future<TodoItem> queryDataById(int id) async {
-    return db.query(tableTodo, where: 'id = ?', whereArgs: [id]).then((value) {
-      return TodoItem.fromJson(value.first);
-    });
+  Future<TodoItem?> queryDataById(int id) async {
+    var list = await db?.query(tableTodo, where: 'id = ?', whereArgs: [id]);
+    if(list != null && list.isNotEmpty){
+      return TodoItem.fromJson(list[0]);
+    }
+    return null;
   }
 
   /// Update data
   Future<void> updateData(TodoItem todo) async {
-    await db.update(
+    await db?.update(
       tableTodo,
       todo.toJson(),
       where: 'id = ?',
@@ -166,15 +181,23 @@ class ToDoProvider {
 
   /// Delete data
   Future<void> deleteData(TodoItem todo) async {
-    await db.delete(
+    await db?.delete(
       tableTodo,
       where: 'id = ?',
       whereArgs: [todo.id],
     );
   }
+  /// Delete data
+  Future<void> deleteDataById(int id) async {
+    await db?.delete(
+      tableTodo,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
 
   Future<void> closeAsync() async {
-    await db.close();
+    await db?.close();
   }
 }
 

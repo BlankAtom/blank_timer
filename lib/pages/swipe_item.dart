@@ -1,4 +1,5 @@
 import 'package:blank_timer/pages/todo.dart';
+import 'package:blank_timer/todo_data.dart';
 import 'package:flutter/material.dart';
 
 /// Item of SwipeList
@@ -15,8 +16,12 @@ class SwipeItem extends StatefulWidget {
 
   final Key key;
 
+  final ValueChanged<TodoItem> onItemDeleted;
+  
+  final TodoItem todoItem;
+
   SwipeItem(
-      {required this.key, required this.child});
+      {required this.key, required this.child, required this.onItemDeleted, required this.todoItem});
 
   @override
   _SwipeItemState createState() => _SwipeItemState();
@@ -63,55 +68,45 @@ class _SwipeItemState extends State<SwipeItem> {
       ),
     );
 
-    return Container(
-      decoration: BoxDecoration(
-        color: _itemForegroundColor,
-        borderRadius: _itemCircleRadius,
-      ),
-      child: Dismissible(
-        key: widget.key,
-
-        // Left background
-        background: background,
-
-        // Right background
-        secondaryBackground: secondaryBackground,
-
-        onDismissed: (direction) {
-          debugPrint('删除');
-        },
-
-        confirmDismiss: (direction) async {
-          if (direction == DismissDirection.endToStart) {
-            debugPrint('删除 confirmDismiss');
-            return true;
-          }
-          return false;
-        },
-
-        child: SizedBox(
-          height: _itemHeight,
-          child: Row(
-            children: [
-              SizedBox(
-                width: _checkBoxWidth,
-
-                // The Selecter box
-                child: Checkbox(
-                  onChanged: (v) {
-                    setState(() {
-                      checked = v!;
-                    });
-                  },
-                  value: checked,
-                  shape: const CircleBorder(),
-                ),
+    return Dismissible(
+      key: widget.key,
+      background: background,
+      secondaryBackground: secondaryBackground,
+      onDismissed: (direction) {
+          widget.onItemDeleted(widget.todoItem);
+      },
+      confirmDismiss: (direction) async {
+        if (direction == DismissDirection.endToStart) {
+          return true;
+        }
+        return false;
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: _itemForegroundColor,
+          borderRadius: _itemCircleRadius,
+        ),
+        height: _itemHeight,
+        child: Row(
+          children: [
+            SizedBox(
+              width: _checkBoxWidth,
+      
+              // The Selecter box
+              child: Checkbox(
+                onChanged: (v) {
+                  setState(() {
+                    checked = v!;
+                  });
+                },
+                value: checked,
+                shape: const CircleBorder(),
               ),
-              Expanded(
-                child: widget.child,
-              ),
-            ],
-          ),
+            ),
+            Expanded(
+              child: widget.child,
+            ),
+          ],
         ),
       ),
     );

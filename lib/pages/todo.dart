@@ -1,45 +1,83 @@
+import 'package:blank_timer/event_bus.dart';
 import 'package:blank_timer/todo_data.dart';
 import 'package:blank_timer/widgets/slider_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-import 'swipe_list.dart';
+import 'todo_list_group_view.dart';
 
-class TodoConstraint {
-  static const todoNavigationBottoms = <BottomNavigationBarItem>[
-    BottomNavigationBarItem(
-      icon: Icon(Icons.timer),
-      label: 'Timer',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.today_rounded),
-      label: 'Today',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.sunny),
-      label: 'Alarm',
-    ),
-  ];
+// class TodoConstraint {
+//   static const todoNavigationBottoms = <BottomNavigationBarItem>[
+//     BottomNavigationBarItem(
+//       icon: Icon(Icons.timer),
+//       label: 'Timer',
+//     ),
+//     BottomNavigationBarItem(
+//       icon: Icon(Icons.today_rounded),
+//       label: 'Today',
+//     ),
+//     BottomNavigationBarItem(
+//       icon: Icon(Icons.sunny),
+//       label: 'Alarm',
+//     ),
+//   ];
 
-  // static const
-}
+//   // static const
+// }
 
-class TodoPage extends StatefulWidget {
+// class TodayTodoPage extends StatelessWidget {
+
+//   TodayTodoPage({Key? key}) : super(key: key){
+//     bus.on("todoUpdated", (arg) {
+//       // do something
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return
+//   }
+// }
+
+class TodayTodoPage extends StatefulWidget {
   @override
-  _TodoPageState createState() => _TodoPageState();
+  _TodayTodoPageState createState() => _TodayTodoPageState();
 }
 
-class _TodoPageState extends State<TodoPage> {
+/// 今日待办页面
+/// Data：今日待办数据
+/// Where：
+class _TodayTodoPageState extends State<TodayTodoPage> {
   late int _pageIndex = 1;
   late ToDoProvider _todoProvider;
 
-  _TodoPageState(){
+  _TodayTodoPageState() {
     _todoProvider = ToDoProvider();
   }
+
+  List<TodoItem> items = [];
 
   @override
   void initState() {
     super.initState();
+
+    bus.on("todoUpdated", (arg) {
+      _todoProvider.queryData().then((value) {
+        setState(() {
+          items = value;
+        });
+
+        debugPrint('Todo updated');
+      });
+    });
+
+    _todoProvider.openDb().then((value) {
+      _todoProvider.queryData().then((value) {
+        setState(() {
+          items = value;
+        });
+      });
+    });
   }
 
   void onTabTapped(int index) {
@@ -48,46 +86,53 @@ class _TodoPageState extends State<TodoPage> {
     });
   }
 
-  Future<List<TodoItem>> getItems() async {
-    await _todoProvider.openDb();
-    return _todoProvider.queryData();
-  }
+  // Future<List<TodoItem>> getItems() async {
+  //   await _todoProvider.openDb();
+  //   return _todoProvider.queryData();
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white70,
-      body: FutureBuilder(
+      body: Center(
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: 720, // Set the maximum width here
+          ),
         
-          future: _todoProvider.openDb(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            } else {
-              return Column(
-                children: [
-                  Expanded(
-                    child: SwipeList(
-                      groupTitle: 'Done',
-                      provider: _todoProvider,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TodoAddBox(onAdded: (value) {
-                      _todoProvider.insertData(value);
-                    }),
-                  ),
-                ],
-              );
-            }
-          }),
-      bottomNavigationBar: BottomNavigationBar(
-        items: TodoConstraint.todoNavigationBottoms,
-        currentIndex: _pageIndex,
-        onTap: onTabTapped,
+          alignment: Alignment.topCenter,
+          
+          child: Column(
+            children: [
+              Expanded(
+                child: TodoListGroupView(
+                  groupTitle: '未完成',
+                  // provider: _todoProvider,
+                  children: items,
+                  onItemChange: (item) {
+                    // item.status = 2;
+                    // item.updatedAt = DateTime.now().millisecondsSinceEpoch;
+                    _todoProvider.updateData(item);
+                    bus.emit("todoUpdated");
+                  },
+                  onItemDeleted: (id) {
+                    debugPrint('Deleted: $id');
+                    _todoProvider.deleteDataById(id);
+                    bus.emit("todoUpdated");
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TodoAddBox(onAdded: (value) {
+                  _todoProvider.insertData(value);
+                  bus.emit("todoUpdated");
+                }),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -147,12 +192,20 @@ class _TodoAddBoxState extends State<TodoAddBox> {
   }
 
   void _handleSubmitted(String text) {
-    TodoItem item = TodoItem(0, text, 1, DateTime.now().millisecondsSinceEpoch, '', '', 0, DateTime.now().millisecondsSinceEpoch, DateTime.now().millisecondsSinceEpoch);
+    TodoItem item = TodoItem(
+        0,
+        text,
+        1,
+        DateTime.now().millisecondsSinceEpoch,
+        '',
+        '',
+        0,
+        DateTime.now().millisecondsSinceEpoch,
+        DateTime.now().millisecondsSinceEpoch);
 
     setState(() {
-      
-        widget.onAdded(item);
-        _controller!.clear();
+      widget.onAdded(item);
+      _controller!.clear();
     });
   }
 }
