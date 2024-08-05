@@ -2,6 +2,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class SliderContainer extends StatefulWidget {
+  const SliderContainer({super.key});
+
   @override
   _SliderContainerState createState() => _SliderContainerState();
 }
@@ -42,7 +44,7 @@ class _SliderContainerState extends State<SliderContainer> {
             onPressed: () {
               print('Pressed');
             },
-            icon: Icon(Icons.arrow_forward_ios),
+            icon: const Icon(Icons.arrow_forward_ios),
           ),
         ],
       ),

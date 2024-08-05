@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 class SwipeItem extends StatefulWidget {
   final Widget child;
 
+  @override
   final Key key;
 
   final ValueChanged<TodoItem> onItemDeleted;
@@ -22,7 +23,7 @@ class SwipeItem extends StatefulWidget {
 
   final ValueChanged<TodoItem> onItemChange;
 
-  SwipeItem(
+  const SwipeItem(
       {required this.key,
       required this.child,
       required this.onItemDeleted,
@@ -42,14 +43,14 @@ class _SwipeItemState extends State<SwipeItem> {
 
   @override
   Widget build(BuildContext context) {
-    final Color _itemForegroundColor = Colors.pink[50]!;
-    final Color _itemDoneForegroundColor = Colors.grey;
-    final Color _itemDeleteViewColor = Color(Colors.red[400]!.value);
-    final Color _itemMoveViewColor = Color(Colors.blue[400]!.value);
+    final Color itemForegroundColor = Colors.pink[50]!;
+    const Color itemDoneForegroundColor = Colors.grey;
+    final Color itemDeleteViewColor = Color(Colors.red[400]!.value);
+    final Color itemMoveViewColor = Color(Colors.blue[400]!.value);
 
     var background = Container(
       decoration: BoxDecoration(
-        color: _itemMoveViewColor,
+        color: itemMoveViewColor,
         borderRadius: _itemCircleRadius,
       ),
       child: const Center(
@@ -64,7 +65,7 @@ class _SwipeItemState extends State<SwipeItem> {
     );
     var secondaryBackground = Container(
       decoration: BoxDecoration(
-        color: _itemDeleteViewColor,
+        color: itemDeleteViewColor,
         borderRadius: _itemCircleRadius,
       ),
       alignment: Alignment.centerRight,
@@ -77,7 +78,7 @@ class _SwipeItemState extends State<SwipeItem> {
 
     return Container(
       decoration: BoxDecoration(
-        color: widget.todoItem.isDone == 1 ? _itemDoneForegroundColor : _itemForegroundColor,
+        color: widget.todoItem.isDone == 1 ? itemDoneForegroundColor : itemForegroundColor,
         borderRadius: _itemCircleRadius,
       ),
       height: _itemHeight,
@@ -126,7 +127,7 @@ class _SwipeItemState extends State<SwipeItem> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: _itemForegroundColor,
+          color: itemForegroundColor,
           borderRadius: _itemCircleRadius,
         ),
         height: _itemHeight,

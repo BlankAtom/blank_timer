@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 class StepperExample extends StatefulWidget {
+  const StepperExample({super.key});
+
   @override
   _StepperExampleState createState() => _StepperExampleState();
 }
@@ -85,7 +87,7 @@ class _StepperExampleState extends State<StepperExample> {
       // ),
       body: Stepper(
         elevation: 4,
-        physics: ClampingScrollPhysics(),
+        physics: const ClampingScrollPhysics(),
         currentStep: _currentStep,
         type: StepperType.horizontal,
         onStepTapped: (step) => setState(() => _currentStep = step),
@@ -130,13 +132,13 @@ class _StepperExampleState extends State<StepperExample> {
         },
         steps: <Step>[
           Step(
-            title: Text('Step 1'),
+            title: const Text('Step 1'),
             content: inputSourceWidget,
             isActive: _currentStep >= 0,
             state: _currentStep >= 0 ? StepState.complete : StepState.disabled,
           ),
           Step(
-            title: Text('Step 2'),
+            title: const Text('Step 2'),
             content: inputDestinationWidget,
             isActive: _currentStep >= 1,
             state: _currentStep >= 1 ? StepState.complete : StepState.disabled,
@@ -150,10 +152,10 @@ class _StepperExampleState extends State<StepperExample> {
             //   ),
             // ),
             // subtitle: Text('Select tables to convert'),
-            title: Text('Step 3'),
+            title: const Text('Step 3'),
             content: Container(
               alignment: Alignment.topLeft,
-              child: Container(
+              child: SizedBox(
                 width: 400,
                 child: Table(
                   children: [
@@ -163,7 +165,7 @@ class _StepperExampleState extends State<StepperExample> {
                           child: Row(
                             children: [
                               Checkbox(value: true, onChanged: (bool? value) {}),
-                              Text('Migrate all'),
+                              const Text('Migrate all'),
                             ],
                           ),
                         ),
@@ -178,15 +180,15 @@ class _StepperExampleState extends State<StepperExample> {
           ),
           // Waiting
           Step(
-            title: Text('Step 4'),
-            label: Text('Step 4'),
+            title: const Text('Step 4'),
+            label: const Text('Step 4'),
             content: Container(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               alignment: Alignment.centerLeft,
-              child: Container(
+              child: SizedBox(
                 width: 40,
                 height: 40,
-                child: CircularProgressIndicator(
+                child: const CircularProgressIndicator(
                   value: 0.3,
                   backgroundColor: Colors.grey,
                   strokeCap: StrokeCap.round,
@@ -208,9 +210,9 @@ class _StepperExampleState extends State<StepperExample> {
       child: Column(
         children: <Widget>[
           Container(
-            padding: EdgeInsets.all(8),
+            padding: const EdgeInsets.all(8),
             width: 400,
-            child: Text(
+            child: const Text(
               'Enter source data configuration:',
               textAlign: TextAlign.left,
               style: TextStyle(
@@ -222,7 +224,7 @@ class _StepperExampleState extends State<StepperExample> {
 
           // 下拉选择数据库类型
           Container(
-            padding: EdgeInsets.all(8),
+            padding: const EdgeInsets.all(8),
             width: 400,
             child: DropdownButton<String>(
               value: dropdownValue,
@@ -261,7 +263,7 @@ class _StepperExampleState extends State<StepperExample> {
           ),
 
           Container(
-            padding: EdgeInsets.all(8),
+            padding: const EdgeInsets.all(8),
             width: 400,
             child: Row(
               children: [
@@ -271,7 +273,7 @@ class _StepperExampleState extends State<StepperExample> {
                     padding: const EdgeInsets.only(right: 4.0),
                     child: TextFormField(
                       controller: source == 1 ? _hostController : _hostDesController,
-                      decoration: InputDecoration(labelText: 'Host'),
+                      decoration: const InputDecoration(labelText: 'Host'),
                     ),
                   ),
                 ),
@@ -281,7 +283,7 @@ class _StepperExampleState extends State<StepperExample> {
                     padding: const EdgeInsets.only(left: 4.0),
                     child: TextFormField(
                       controller: source == 1 ? _portController : _portDesController,
-                      decoration: InputDecoration(labelText: 'Port'),
+                      decoration: const InputDecoration(labelText: 'Port'),
                     ),
                   ),
                 )
@@ -289,7 +291,7 @@ class _StepperExampleState extends State<StepperExample> {
             ),
           ),
 
-          Container(
+          SizedBox(
             width: 400,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -297,12 +299,12 @@ class _StepperExampleState extends State<StepperExample> {
                 padding: const EdgeInsets.all(4.0),
                 child: TextFormField(
                   controller: source == 1 ? _usernameController : _usernameDesController,
-                  decoration: InputDecoration(labelText: 'Username'),
+                  decoration: const InputDecoration(labelText: 'Username'),
                 ),
               ),
             ),
           ),
-          Container(
+          SizedBox(
             width: 400,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -310,13 +312,13 @@ class _StepperExampleState extends State<StepperExample> {
                 padding: const EdgeInsets.all(4.0),
                 child: TextFormField(
                   controller: source == 1 ? _passwordController : _passwordDesController,
-                  decoration: InputDecoration(labelText: 'Password'),
+                  decoration: const InputDecoration(labelText: 'Password'),
                 ),
               ),
             ),
           ),
 
-          Container(
+          SizedBox(
             width: 400,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -324,13 +326,13 @@ class _StepperExampleState extends State<StepperExample> {
                 padding: const EdgeInsets.all(4.0),
                 child: TextFormField(
                   controller: source == 1 ? _initialCatalogController : _initialCatalogDesController,
-                  decoration: InputDecoration(labelText: 'Choose Initial Catalog'),
+                  decoration: const InputDecoration(labelText: 'Choose Initial Catalog'),
                 ),
               ),
             ),
           ),
 
-          Container(
+          SizedBox(
             width: 400,
             child: Row(
               children: [
@@ -341,7 +343,7 @@ class _StepperExampleState extends State<StepperExample> {
                     onChanged: (bool? value) {},
                   ),
                 ),
-                Text('Trust server certificate')
+                const Text('Trust server certificate')
               ],
             ),
           ),
