@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:blank_timer/pages/menu.dart';
 import 'package:blank_timer/pages/todo.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -14,10 +15,10 @@ Map<String, WidgetBuilder> routes = {
 };
 
 void main() {
-  if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-  }
+  // if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+  //   sqfliteFfiInit();
+  //   databaseFactory = databaseFactoryFfi;
+  // }
   runApp(const MyApp());
 }
 
@@ -49,7 +50,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // routes: routes,
-      home: TodayTodoPage(),
+      home: const MenuExamplePage(title: 'Home',),
     );
   }
 }

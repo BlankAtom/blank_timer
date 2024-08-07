@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class MyApp extends StatelessWidget {
@@ -28,7 +27,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MenuExamplePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
@@ -46,8 +45,8 @@ enum MenuEntry {
   const MenuEntry(this.label);
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class MenuExamplePage extends StatefulWidget {
+  const MenuExamplePage({super.key, required this.title});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -61,12 +60,12 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MenuExamplePage> createState() => _MenuExamplePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MenuExamplePageState extends State<MenuExamplePage> {
   int _counter = 0;
-MenuEntry? _lastSelection;
+  MenuEntry? _lastSelection;
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -107,7 +106,6 @@ MenuEntry? _lastSelection;
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -124,38 +122,26 @@ MenuEntry? _lastSelection;
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-        actions: [
-          MenuBar(
-            style: MenuStyle(
-                backgroundColor:
-                    WidgetStateColor.resolveWith((states) => Colors.white),),
+        title: Builder(builder: (context) {
+          return Row(
             children: [
-              SubmenuButton(menuChildren: _meunList(), child: const Text("菜单1")),
-              SubmenuButton(menuChildren: _meunList(), child: const Text("菜单2")),
-              SubmenuButton(menuChildren: _meunList(), child: const Text("菜单3")),
-               MenuAnchor(
-          childFocusNode: _buttonFocusNode,
-          menuChildren: _meunList(),
-          builder:
-              (BuildContext context, MenuController controller, Widget? child) {
-            return TextButton(
-              focusNode: _buttonFocusNode,
-              onPressed: () {
-                if (controller.isOpen) {
-                  controller.close();
-                } else {
-                  controller.open();
-                }
-              },
-              child: const Text('OPEN MENU'),
-            );
-          },
-        ),
-            ]),
-          Icon(Icons.search),
-          Icon(Icons.search),
+              headerTextMenu(
+                const Text('About'),
+                () => Scaffold.of(context).openDrawer(),
+              )
+            ],
+          );
+        }),
+        actions: [
+          // headerTextMenu(const Text('About')),
         ],
+        leading: FlutterLogo(),
+        shape: const BeveledRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(10),
+            bottomRight: Radius.circular(10),
+          ),
+        ),
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -190,6 +176,30 @@ MenuEntry? _lastSelection;
           ],
         ),
       ),
+
+      drawer: Drawer(
+        shape: BeveledRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+
+        // Add a ListView to the drawer. This ensures the user can scroll
+        // through the options in the drawer if there isn't enough vertical
+        // space to fit everything.
+        child: ListView(
+          // Important: Remove any padding from the ListView.
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text('Drawer Header'),
+            ),
+            ListTile(
+              title: const Text('Home'),
+            ),
+          ],
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
@@ -198,44 +208,57 @@ MenuEntry? _lastSelection;
     );
   }
 
- // https://juejin.cn/post/7194705921128267813#heading-2
+  Widget headerTextMenu(Widget centerChild, void Function() param1) {
+    return HeaderTextPopupMenu(
+      centerChild: centerChild,
+      menuChildren: _meunList(),
+      pressed: param1,
+    );
+    return MenuAnchor(
+      childFocusNode: _buttonFocusNode,
+      menuChildren: _meunList(),
+      builder:
+          (BuildContext context, MenuController controller, Widget? child) {
+        return TextButton(
+          style: TextButton.styleFrom(
+              //  Theme.of(context).colorScheme.onSurface,
+              ),
+          focusNode: _buttonFocusNode,
+          onPressed: () {
+            if (controller.isOpen) {
+              controller.close();
+            } else {
+              controller.open();
+            }
+          },
+          child: centerChild,
+        );
+      },
+    );
+  }
+
+  // https://juejin.cn/post/7194705921128267813#heading-2
   List<Widget> _meunList() {
     return <Widget>[
       MenuItemButton(
-        child: Text(MenuEntry.about.label),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(MenuEntry.about.label),
+        ),
         onPressed: () => _activate(MenuEntry.about),
       ),
-      if (_showingMessage)
-        MenuItemButton(
-          onPressed: () => _activate(MenuEntry.hideMessage),
-          child: Text(MenuEntry.hideMessage.label),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: MenuItemButton(
+            child: Text(MenuEntry.about.label),
+            onPressed: () => _activate(MenuEntry.about),
+          ),
         ),
-      if (!_showingMessage)
-        MenuItemButton(
-          onPressed: () => _activate(MenuEntry.showMessage),
-          child: Text(MenuEntry.showMessage.label),
-        ),
-      SubmenuButton(
-        leadingIcon: const Icon(Icons.ac_unit_sharp),
-        menuChildren: <Widget>[
-          MenuItemButton(
-            onPressed: () => _activate(MenuEntry.colorRed),
-            child: Text(MenuEntry.colorRed.label),
-          ),
-          MenuItemButton(
-            onPressed: () => _activate(MenuEntry.colorGreen),
-            child: Text(MenuEntry.colorGreen.label),
-          ),
-          MenuItemButton(
-            onPressed: () => _activate(MenuEntry.colorBlue),
-            child: Text(MenuEntry.colorBlue.label),
-          ),
-        ],
-        child: const Text('Background Color'),
       ),
     ];
   }
-
 
   void _activate(MenuEntry selection) {
     setState(() {
@@ -281,5 +304,123 @@ MenuEntry? _lastSelection;
         value: 'Item 2',
       ),
     ];
+  }
+}
+
+class HeaderTextPopupMenu extends StatefulWidget {
+  HeaderTextPopupMenu({
+    required this.centerChild,
+    required this.menuChildren,
+    required this.pressed,
+  }) {}
+
+  final Widget centerChild;
+  final List<Widget> menuChildren;
+  final Function() pressed;
+
+  @override
+  State<StatefulWidget> createState() => _HeaderTextPopupMenuState();
+}
+
+class _HeaderTextPopupMenuState extends State<HeaderTextPopupMenu>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late MenuController _menuController;
+  late FocusNode _focusNode;
+  @override
+  void initState() {
+    super.initState();
+
+    _focusNode = FocusNode(debugLabel: 'Menu Button');
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+      reverseDuration: const Duration(milliseconds: 100),
+    );
+    // _animationController.addStatusListener(_onStatusChanged);
+
+    _menuController = MenuController();
+    // _menuController.
+    // _menuController.
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _onStatusChanged(AnimationStatus status) {
+    if (status == AnimationStatus.dismissed) {
+      if (_menuController.isOpen) {
+        // _menuController.close();
+        _animationController.reverse();
+      } else {
+        // _menuController.open();
+        _animationController.forward();
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        MouseRegion(
+          onHover: (value) {
+            debugPrint('Hover: $value');
+            if (!_menuController.isOpen) {
+              _menuController.close();
+              _animationController.reverse();
+            } 
+          },
+          child: MenuAnchor(
+            menuChildren: List.from(widget.menuChildren),
+            
+            controller: _menuController,
+            alignmentOffset: Offset(0, 32),
+            childFocusNode: _focusNode,
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            if (_menuController.isOpen) {
+              _menuController.close();
+              _animationController.reverse();
+            } else {
+              _menuController.open();
+              _animationController.forward();
+            }
+          },
+          onHover: (value) {
+            _focusNode.requestFocus();
+            if (value) {
+              _menuController.open();
+              // widget.pressed();
+              _animationController.forward();
+            } else {
+              // _menuController.close();
+              // _animationController.reverse();
+            }
+          },
+          onFocusChange: (value) => debugPrint('Focus: $value'),
+          child: Row(
+            children: [
+              widget.centerChild,
+              AnimatedBuilder(
+                animation: _animationController,
+                builder: (context, child) {
+                  return Transform.rotate(
+                    angle: _animationController.value * 1 * 3.1415926,
+                    child: Icon(Icons.arrow_drop_down),
+                  );
+                },
+              )
+            ],
+          ),
+        ),
+        
+      ],
+    );
   }
 }
