@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:blank_timer/pages/menu.dart';
 import 'package:blank_timer/pages/todo.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -8,16 +9,16 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'pages/converter.dart';
 
 Map<String, WidgetBuilder> routes = {
-  '/': (context) => MyHomePage(title: 'Flutter Demo Home Page'),
+  '/': (context) => const MyHomePage(title: 'Flutter Demo Home Page'),
   '/todo': (context) => TodayTodoPage(),
   '/converter': (context) => StepperExample(),
 };
 
 void main() {
-  if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-  }
+  // if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+  //   sqfliteFfiInit();
+  //   databaseFactory = databaseFactoryFfi;
+  // }
   runApp(const MyApp());
 }
 
@@ -49,7 +50,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // routes: routes,
-      home: TodayTodoPage(),
+      home: const MenuExamplePage(title: 'Home',),
     );
   }
 }
@@ -87,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   final List<Widget> _children = [
-    MyTimerViewWidget(),
+    const MyTimerViewWidget(),
     TimerActive(
       scale: 10 * 1000,
     ),
@@ -182,7 +183,7 @@ class _TimerItemState extends State<TimerItem> {
 
   void startStopwatch() {
     _stopwatch.start();
-    _timer = Timer.periodic(Duration(milliseconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 1), (timer) {
       setState(() {});
     });
   }
@@ -203,19 +204,19 @@ class _TimerItemState extends State<TimerItem> {
           children: <Widget>[
             Text(
               elapsedTime,
-              style: TextStyle(fontSize: 24),
+              style: const TextStyle(fontSize: 24),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 ElevatedButton(
                   onPressed: startStopwatch,
-                  child: Text('Start'),
+                  child: const Text('Start'),
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton(
                   onPressed: stopStopwatch,
-                  child: Text('Stop'),
+                  child: const Text('Stop'),
                 ),
               ],
             ),
@@ -374,8 +375,8 @@ class CircleProgressBar extends StatelessWidget {
   final String label;
   final bool isRunning;
 
-  CircleProgressBar(
-      {required this.progress,
+  const CircleProgressBar(
+      {super.key, required this.progress,
       required this.isRunning,
       required this.label,
       required this.lastProgress});
@@ -385,7 +386,7 @@ class CircleProgressBar extends StatelessWidget {
     return Container(
       width: 200,
       height: 200,
-      margin: EdgeInsets.all(20),
+      margin: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         boxShadow: [
@@ -393,7 +394,7 @@ class CircleProgressBar extends StatelessWidget {
             color: Colors.blue.withOpacity(0.5),
             spreadRadius: 4,
             blurRadius: 8,
-            offset: Offset(0, 0), // changes position of shadow
+            offset: const Offset(0, 0), // changes position of shadow
           ),
         ],
       ),
@@ -425,8 +426,8 @@ class AnimatedCircle extends StatefulWidget {
   final double lastProgress;
   final Widget child;
 
-  AnimatedCircle(
-      {required this.progress,
+  const AnimatedCircle(
+      {super.key, required this.progress,
       required this.child,
       required this.lastProgress});
   @override
@@ -464,7 +465,7 @@ class _AnimatedCircleState extends State<AnimatedCircle>
   @override
   Widget build(BuildContext context) {
     // _controller.forward();
-    print('Animator circle: ${_pro}');
+    print('Animator circle: $_pro');
     return CustomPaint(
       foregroundPainter: CircleProgressPainter(progress: _pro),
       child: widget.child,

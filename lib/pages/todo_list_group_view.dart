@@ -39,7 +39,7 @@ class _TodoListGroupViewState extends State<TodoListGroupView> {
   final Color groupHeaderColor = Colors.pink[100]!;
   final Color groupDoneHeaderColor = Colors.purple[100]!; 
 
-  final Color _itemForegroundColor = Color.fromRGBO(223, 223, 223, 1);
+  final Color _itemForegroundColor = const Color.fromRGBO(223, 223, 223, 1);
   final Color _itemDeleteViewColor = Color(Colors.red[400]!.value);
   final Color _itemMoveViewColor = Color(Colors.blue[400]!.value);
   final double _checkBoxWidth = 50;
@@ -83,7 +83,7 @@ class _TodoListGroupViewState extends State<TodoListGroupView> {
         (widget.doneItems.isNotEmpty ? 1 : 0);
     return ListView.builder(
       reverse: true,
-      physics: ClampingScrollPhysics(),
+      physics: const ClampingScrollPhysics(),
       itemCount: length,
       itemBuilder: (context, index) {
         if (index == widget.undoItems.length && widget.undoItems.isNotEmpty) {
@@ -108,7 +108,6 @@ class _TodoListGroupViewState extends State<TodoListGroupView> {
                 return false;
               },
               child: SwipeItem(
-                child: Text(''),
                 todoItem: item,
                 onItemDeleted: (key) {
                   widget.onItemDeleted(item.id);
@@ -117,6 +116,7 @@ class _TodoListGroupViewState extends State<TodoListGroupView> {
                   widget.onItemChange(item);
                 },
                 key: Key(item.id.toString()),
+                child: Text(''),
               ),
             ),
           );
@@ -147,7 +147,6 @@ class _TodoListGroupViewState extends State<TodoListGroupView> {
                 return false;
               },
               child: SwipeItem(
-                child: Text(''),
                 todoItem: item,
                 onItemDeleted: (key) {
                   widget.onItemDeleted(item.id);
@@ -156,6 +155,7 @@ class _TodoListGroupViewState extends State<TodoListGroupView> {
                   widget.onItemChange(item);
                 },
                 key: Key(item.id.toString()),
+                child: Text(''),
               ),
             ),
           );
@@ -248,9 +248,9 @@ class _TodoListGroupViewState extends State<TodoListGroupView> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // TODO 添加旋转效果，需要用到 Animate， Trasform
-                if (widget.isExpanded) Icon(Icons.keyboard_arrow_down_rounded),
+                if (widget.isExpanded) const Icon(Icons.keyboard_arrow_down_rounded),
                 if (!widget.isExpanded)
-                  Icon(Icons.keyboard_arrow_right_rounded),
+                  const Icon(Icons.keyboard_arrow_right_rounded),
 
                 Padding(
                   padding:

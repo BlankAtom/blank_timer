@@ -40,6 +40,8 @@ import 'todo_list_group_view.dart';
 // }
 
 class TodayTodoPage extends StatefulWidget {
+  const TodayTodoPage({super.key});
+
   @override
   _TodayTodoPageState createState() => _TodayTodoPageState();
 }
@@ -99,7 +101,7 @@ class _TodayTodoPageState extends State<TodayTodoPage> {
     return Scaffold(
       backgroundColor: Theme.of(context).canvasColor,
       bottomNavigationBar: BottomNavigationBar(
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.history),
             label: 'History',
@@ -118,8 +120,8 @@ class _TodayTodoPageState extends State<TodayTodoPage> {
       ),
       body: Center(
         child: Container(
-          margin:  EdgeInsets.symmetric(horizontal: 24),
-          constraints: BoxConstraints(
+          margin:  const EdgeInsets.symmetric(horizontal: 24),
+          constraints: const BoxConstraints(
             maxWidth: 720, // Set the maximum width here
           ),
           alignment: Alignment.topCenter,
@@ -145,7 +147,7 @@ class _TodayTodoPageState extends State<TodayTodoPage> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(top: 16), 
+                margin: const EdgeInsets.only(top: 16), 
                 child: TodoAddBox(onAdded: (value) {
                   _todoProvider.insertData(value);
                   bus.emit("todoUpdated");
@@ -170,7 +172,7 @@ class TodoAddBox extends StatefulWidget {
 
 class _TodoAddBoxState extends State<TodoAddBox> {
   TextEditingController? _controller;
-  FocusNode _focusNode = FocusNode();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -200,8 +202,8 @@ class _TodoAddBoxState extends State<TodoAddBox> {
       child: Container(
         child: Row(
           children: [
-            Icon(Icons.add),
-            SizedBox(width: 8),
+            const Icon(Icons.add),
+            const SizedBox(width: 8),
             Expanded(
               // padding: const EdgeInsets.all(8.0),
               child: TextField(
