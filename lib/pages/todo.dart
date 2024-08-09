@@ -97,7 +97,7 @@ class _TodayTodoPageState extends State<TodayTodoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Colors.white70,
+      backgroundColor: Theme.of(context).canvasColor,
       bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(
@@ -193,7 +193,7 @@ class _TodoAddBoxState extends State<TodoAddBox> {
     return Container(
       height: 56,
       decoration: BoxDecoration(
-        color: Colors.white70,
+        color: Colors.white30,
         borderRadius: BorderRadius.circular(4),
       ),
       padding: const EdgeInsets.all(8),
