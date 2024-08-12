@@ -1,5 +1,6 @@
 import 'package:blank_timer/event_bus.dart';
 import 'package:blank_timer/todo_data.dart';
+import 'package:blank_timer/widgets/input_tile.dart';
 import 'package:blank_timer/widgets/slider_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -127,6 +128,7 @@ class _TodayTodoPageState extends State<TodayTodoPage> {
           alignment: Alignment.topCenter,
           child: Column(
             children: [
+              InputTile(),
               Expanded(
                 child: TodoListGroupView(
                   groupTitle: '未完成',
